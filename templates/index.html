@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v3.8.6">
+    <title>Sponsor good food</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/pricing/">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+    <h5 class="my-0 mr-md-auto font-weight-normal">Sponsor good food</h5>
+    <nav class="my-2 my-md-0 mr-md-3">
+    </nav>
+</div>
+
+<div class="container">
+
+    <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h2 class="display-5">1. Choose a sponsorship</h2>
+        <p class="lead">We will buy gift cards and donate them to MU and Boone hospital staff</p>
+    </div>
+
+    <div class="card-deck mb-3 text-center">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">One-time</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="card-title pricing-card-title">
+                    <div class="btn-group btn-group-lg" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-secondary ">$1</button>
+                        <button type="button" class="btn btn-secondary">$5</button>
+                        <button type="button" class="btn btn-secondary">$15</button>
+                        <button type="button" class="btn btn-secondary">$50</button>
+                        <button type="button" class="btn btn-secondary">$100</button>
+                        <button type="button" class="btn btn-secondary">$500</button>
+                    </div>
+                </h1>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>amounts over $20 get split into multiple gift cards</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Recurring</h4>
+            </div>
+            <div class="card-body">
+                <h1 class="card-title pricing-card-title">
+                    <div class="btn-group btn-group-lg" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-primary">$5</button>
+                        <button type="button" class="btn btn-secondary">$15</button>
+                        <button type="button" class="btn btn-secondary">$50</button>
+                        <button type="button" class="btn btn-secondary">$100</button>
+                    </div>
+                    <small class="text-muted">/ week</small></h1>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>automatic cancel when CDC ends social distancing</li>
+                    <li>cancel manually any time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h2 class="display-5">2. Pick restaurants</h2>
+        <p class="lead">Your sponsorship goes towards keeping these kitchens cooking</p>
+    </div>
+
+    <div class="form-group">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" for="inlineCheckbox1">Balance across all restaurants</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" for="inlineCheckbox1">Honest Jakes chicken patties</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+            <label class="form-check-label" for="inlineCheckbox2">Fat Jakes BBQ</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+            <label class="form-check-label" for="inlineCheckbox2">Jacobs Spaghetteria</label>
+        </div>
+    </div>
+
+    <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h2 class="display-5">3. Payment details</h2>
+        <p class="lead">We are ran by volunteers. Our credit card provider charges a small fee, all other money goes directly towards gift cards.</p>
+    </div>
+
+    <div class="form-group">
+        <label for="card-element">Credit or debit card</label>
+        <div id="card-element" class="form-control" style='height: 2.4em; padding-top: .7em;'>
+        </div>
+        <div id="card-errors" role="alert"></div>
+    </div>
+
+    <button id="submit-button" type="button" class="btn btn-lg btn-block btn-primary">Sponsor</button>
+
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row">
+            <div class="col-12 col-md">
+                <img class="mb-2" src="/docs/4.4/assets/brand/bootstrap-solid.svg" alt="" width="24" height="24">
+                <small class="d-block mb-3 text-muted">&copy; 2017-2019</small>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Resources</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="#">Resource</a></li>
+                    <li><a class="text-muted" href="#">Resource name</a></li>
+                    <li><a class="text-muted" href="#">Another resource</a></li>
+                    <li><a class="text-muted" href="#">Final resource</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>About</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="#">Team</a></li>
+                    <li><a class="text-muted" href="#">Locations</a></li>
+                    <li><a class="text-muted" href="#">Privacy</a></li>
+                    <li><a class="text-muted" href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var stripe = Stripe('pk_test_U8DYWAzy4PnkEEnBo5ElR71100sNErzhhO');
+        var elements = stripe.elements();
+
+        var style = {
+            base: {
+                color: "#32325d",
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: "antialiased",
+                fontSize: "16px",
+                "::placeholder": {
+                    color: "#aab7c4"
+                }
+            },
+            invalid: {
+                color: "#fa755a",
+                iconColor: "#fa755a"
+            }
+        };
+
+        var cardElement = elements.create("card", { style: style });
+        cardElement.mount("#card-element");
+
+        var form = document.getElementById('submit-button');
+
+        function stripePaymentMethodHandler(result, email) {
+            if (result.error) {
+                // Show error in payment form
+            } else {
+                // Otherwise send paymentMethod.id to your server
+                fetch('/create-customer', {
+                    method: 'post',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        email: 'jenny.rosen@example.com',
+                        payment_method: result.paymentMethod.id
+                    }),
+                }).then(function(result) {
+                    return result.json();
+                }).then(function(customer) {
+                    // The customer has been created
+                });
+            }
+        }
+
+        form.addEventListener('click', function(event) {
+            // We don't want to let default form submission happen here,
+            // which would refresh the page.
+            event.preventDefault();
+
+            stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    email: 'jenny.rosen@example.com',
+                },
+            }).then(stripePaymentMethodHandler);
+        });
+    </script>
+</div>
+</body>
+</html>
