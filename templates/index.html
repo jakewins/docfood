@@ -4,11 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Jekyll v3.8.6">
-    <title>Sponsor good food</title>
+    <meta name="author" content="Jacob Davis-Hansson">
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/pricing/">
+    <title>DocFood - Sponsor local medical staff with local food</title>
 
     <link href="/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
@@ -52,13 +50,13 @@
             </div>
             <div class="card-body">
                 <h1 class="card-title pricing-card-title">
-                    <div class="btn-group btn-group-lg" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-secondary ">$1</button>
-                        <button type="button" class="btn btn-secondary">$5</button>
-                        <button type="button" class="btn btn-secondary">$15</button>
-                        <button type="button" class="btn btn-secondary">$50</button>
-                        <button type="button" class="btn btn-secondary">$100</button>
-                        <button type="button" class="btn btn-secondary">$500</button>
+                    <div class="btn-group btn-group-lg subscription-buttons" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-secondary" data-type="single">$1</button>
+                        <button type="button" class="btn btn-secondary" data-type="single">$5</button>
+                        <button type="button" class="btn btn-secondary" data-type="single">$15</button>
+                        <button type="button" class="btn btn-secondary" data-type="single">$50</button>
+                        <button type="button" class="btn btn-secondary" data-type="single">$100</button>
+                        <button type="button" class="btn btn-secondary" data-type="single">$500</button>
                     </div>
                 </h1>
                 <ul class="list-unstyled mt-3 mb-4">
@@ -72,11 +70,11 @@
             </div>
             <div class="card-body">
                 <h1 class="card-title pricing-card-title">
-                    <div class="btn-group btn-group-lg" role="group" aria-label="Basic example">
-                        <button type="button" class="btn btn-primary">$5</button>
-                        <button type="button" class="btn btn-secondary">$15</button>
-                        <button type="button" class="btn btn-secondary">$50</button>
-                        <button type="button" class="btn btn-secondary">$100</button>
+                    <div class="btn-group btn-group-lg subscription-buttons" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-primary" data-type="weekly">$5</button>
+                        <button type="button" class="btn btn-secondary" data-type="weekly">$15</button>
+                        <button type="button" class="btn btn-secondary" data-type="weekly">$50</button>
+                        <button type="button" class="btn btn-secondary" data-type="weekly">$100</button>
                     </div>
                     <small class="text-muted">/ week</small></h1>
                 <ul class="list-unstyled mt-3 mb-4">
@@ -94,22 +92,22 @@
 
     <div class="form-group">
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-            <label class="form-check-label" for="inlineCheckbox1">Balance across all restaurants</label>
+            <input class="form-check-input" type="checkbox" id="input-all-restaurants" value="all">
+            <label class="form-check-label" for="input-all-restaurants">Balance across all restaurants</label>
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" id="input-restaurants">
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-            <label class="form-check-label" for="inlineCheckbox1">Honest Jakes chicken patties</label>
+            <input class="form-check-input input-restaurant" type="checkbox" id="input-check-1" value="1">
+            <label class="form-check-label" for="input-check-1">Honest Jakes chicken patties</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-            <label class="form-check-label" for="inlineCheckbox2">Fat Jakes BBQ</label>
+            <input class="form-check-input input-restaurant" type="checkbox" id="input-check-2" value="2">
+            <label class="form-check-label" for="input-check-2">Fat Jakes BBQ</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-            <label class="form-check-label" for="inlineCheckbox2">Jacobs Spaghetteria</label>
+            <input class="form-check-input input-restaurant" type="checkbox" id="input-check-3" value="3">
+            <label class="form-check-label" for="input-check-3">Jacobs Spaghetteria</label>
         </div>
     </div>
 
@@ -155,6 +153,39 @@
     </footer>
 
     <script>
+        // Payment picker
+        let subscriptionButtons = document.querySelectorAll(".subscription-buttons button");
+        subscriptionButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                // clear all the other buttons
+                subscriptionButtons.forEach(other => {
+                    other.classList.remove("btn-primary");
+                    other.classList.add("btn-secondary");
+                });
+
+                // make our button the selected one
+                event.target.classList.add("btn-primary");
+                event.target.classList.remove("btn-secondary");
+            });
+        });
+
+        // Restaurant picker
+        let allRestaurantsCheckbox = document.querySelector("#input-all-restaurants");
+        let restaurantCheckboxes = document.querySelectorAll("#input-restaurants .input-restaurant");
+
+        allRestaurantsCheckbox.addEventListener('change', function(event) {
+            restaurantCheckboxes.forEach(box => {
+                box.checked = event.target.checked;
+            })
+        });
+
+        document.querySelectorAll("#input-restaurants .input-restaurant").forEach(function(checkbox) {
+            checkbox.addEventListener('change', (event) => {
+                allRestaurantsCheckbox.checked = false;
+            });
+        });
+
+        // Set up stripe form element
         var stripe = Stripe('pk_test_U8DYWAzy4PnkEEnBo5ElR71100sNErzhhO');
         var elements = stripe.elements();
 
@@ -182,14 +213,36 @@
         function stripePaymentMethodHandler(result, email) {
             if (result.error) {
                 // Show error in payment form
+                // TODO
             } else {
                 // Otherwise send paymentMethod.id to your server
+
+                let restaurants = [];
+                restaurantCheckboxes.forEach(box => {
+                    if(box.checked) {
+                        restaurants.push(box.value);
+                    }
+                });
+
+                if(restaurantCheckboxes.checked) {
+                    restaurants = "all";
+                }
+
+                let subscription = null;
+                subscriptionButtons.forEach(button => {
+                    if(button.classList.contains("btn-primary")) {
+                        subscription = {"type": button.dataset.type, "amount": button.innerHTML}
+                    }
+                });
+
                 fetch('/create-customer', {
                     method: 'post',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        email: 'jenny.rosen@example.com',
-                        payment_method: result.paymentMethod.id
+                        email: email,
+                        payment_method: result.paymentMethod.id,
+                        restaurants: restaurants,
+                        subscription: subscription,
                     }),
                 }).then(function(result) {
                     return result.json();
