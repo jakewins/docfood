@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"html/template"
 	"io/ioutil"
@@ -11,18 +10,11 @@ import (
 	"os"
 )
 
+var indexTemplate = mustLoadTemplate("index", "templates/index.html")
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tmpl, err := ioutil.ReadFile("templates/index.html")
-	if err != nil {
-		panic(err)
-	}
-	t, err := template.New("index").Parse(string(tmpl))
-	if err != nil {
-		panic(err)
-	}
-	err = t.Execute(w, nil)
-	if err != nil {
-		panic(err)
+	if err := indexTemplate.Execute(w, nil); err != nil {
+		log.Printf("Failed to render index: %s\n", err)
+		w.WriteHeader(503)
 	}
 }
 
@@ -41,14 +33,17 @@ func Subscribe(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	payload := &subscribePayload{}
 	err := json.NewDecoder(r.Body).Decode(payload)
 	if err != nil {
-		panic(err)
+		log.Printf("Failed to read payload: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	fmt.Printf("subscription received: %v\n", payload)
+	log.Printf("subscription received: %v\n", payload)
 
-	w.WriteHeader(201)
+	w.WriteHeader(http.StatusCreated)
 	if _, err = w.Write([]byte("{\"result\": \"ok\"}")); err != nil {
-		panic(err)
+		log.Printf("Failed to write subscribe response for %v: %s\n", payload, err)
+		return
 	}
 }
 
@@ -66,4 +61,16 @@ func main() {
 
 	log.Println("Running at 0.0.0.0:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
+}
+
+func mustLoadTemplate(name, path string) *template.Template {
+	tmpl, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	t, err := template.New(name).Parse(string(tmpl))
+	if err != nil {
+		panic(err)
+	}
+	return t
 }
