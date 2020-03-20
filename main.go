@@ -27,13 +27,13 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 type subscribePayload struct {
-	Email string
-	PaymentMethod string
-	AllRestaurants bool
+	Email               string
+	PaymentMethod       string
+	AllRestaurants      bool
 	SpecificRestaurants []string
-	Subscription struct {
+	Subscription        struct {
 		SubType string
-		Amount string
+		Amount  string
 	}
 }
 
@@ -65,5 +65,5 @@ func main() {
 	}
 
 	log.Println("Running at 0.0.0.0:" + port)
-	log.Fatal(http.ListenAndServe(":" + port, router))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
