@@ -224,24 +224,21 @@
                     }
                 });
 
-                if(restaurantCheckboxes.checked) {
-                    restaurants = "all";
-                }
-
                 let subscription = null;
                 subscriptionButtons.forEach(button => {
                     if(button.classList.contains("btn-primary")) {
-                        subscription = {"type": button.dataset.type, "amount": button.innerHTML}
+                        subscription = {"subType": button.dataset.type, "amount": button.innerHTML}
                     }
                 });
 
-                fetch('/create-customer', {
+                fetch('/v1/subscribe', {
                     method: 'post',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         email: email,
-                        payment_method: result.paymentMethod.id,
-                        restaurants: restaurants,
+                        paymentMethod: result.paymentMethod.id,
+                        allRestaurants: allRestaurantsCheckbox.checked,
+                        specificRestaurants: restaurants,
                         subscription: subscription,
                     }),
                 }).then(function(result) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"html/template"
@@ -25,15 +26,36 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	}
 }
 
-func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+type subscribePayload struct {
+	Email string
+	PaymentMethod string
+	AllRestaurants bool
+	SpecificRestaurants []string
+	Subscription struct {
+		SubType string
+		Amount string
+	}
+}
 
-	fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
+func Subscribe(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	payload := &subscribePayload{}
+	err := json.NewDecoder(r.Body).Decode(payload)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("subscription received: %v\n", payload)
+
+	w.WriteHeader(201)
+	if _, err = w.Write([]byte("{\"result\": \"ok\"}")); err != nil {
+		panic(err)
+	}
 }
 
 func main() {
 	router := httprouter.New()
 	router.GET("/", Index)
-	router.GET("/hello/:name", Hello)
+	router.POST("/v1/subscribe", Subscribe)
 
 	router.NotFound = http.FileServer(http.Dir("./static"))
 
