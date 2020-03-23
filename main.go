@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"feed/pkg/store"
 	"github.com/julienschmidt/httprouter"
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 )
@@ -40,6 +43,21 @@ func Subscribe(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	log.Printf("subscription received: %v\n", payload)
 
+	db, ok := store.FromContext(r.Context())
+	if ! ok {
+		log.Printf("FATAL: No store configured in context\n")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	err = db.CreateSubscription(payload.Email, payload.AllRestaurants, payload.SpecificRestaurants,
+		payload.Subscription.SubType, payload.Subscription.Amount, payload.PaymentMethod)
+	if err != nil {
+		log.Printf("FATAL: Failed to create subscription: %s\n", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	if _, err = w.Write([]byte("{\"result\": \"ok\"}")); err != nil {
 		log.Printf("Failed to write subscribe response for %v: %s\n", payload, err)
@@ -48,6 +66,7 @@ func Subscribe(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func main() {
+
 	router := httprouter.New()
 	router.GET("/", Index)
 	router.POST("/v1/subscribe", Subscribe)
@@ -59,8 +78,24 @@ func main() {
 		port = "8080"
 	}
 
+
+	baseCtx := context.Background()
+
+	var db store.Store
+	if os.Getenv("PRODUCTION") != "" {
+		db = store.NewFirestore()
+	} else {
+		db = store.NewMemStore()
+	}
+
+	baseCtx = store.NewContext(baseCtx, db)
+
+	server := &http.Server{Addr: ":"+port, Handler: router}
+	server.BaseContext = func(config net.Listener) context.Context { return baseCtx }
+
 	log.Println("Running at 0.0.0.0:" + port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+
+	log.Fatal(server.ListenAndServe())
 }
 
 func mustLoadTemplate(name, path string) *template.Template {
