@@ -11,10 +11,9 @@ type Firestore struct {
 	client *firestore.Client
 }
 
-func (f Firestore) CreateSubscription(email string, allRestaurants bool, specificRestaurants []string,
-	subType string, amount string, paymentMethod string) error {
-
-	panic("implement me")
+func (f *Firestore) CreateSubscription(sub Subscription) error {
+	_, _, err := f.client.Collection("subscriptions").Add(context.Background(), sub)
+	return err
 }
 
 var _ Store = &Firestore{}

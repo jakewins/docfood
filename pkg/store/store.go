@@ -5,19 +5,24 @@ import (
 	"fmt"
 )
 
+type Subscription struct {
+	Email string
+	AllRestaurants bool
+	SpecificRestaurants []string
+	SubscriptionType string
+	Amount string
+	PaymentMethod string
+}
+
 type Store interface {
-	CreateSubscription(email string, allRestaurants bool, specificRestaurants []string, subType string, amount string,
-		paymentMethod string) error
+	CreateSubscription(sub Subscription) error
 }
 
 type MemStore struct {
 }
 
-func (m *MemStore) CreateSubscription(email string, allRestaurants bool, specificRestaurants []string,
-	subType string, amount string, paymentMethod string) error {
-	fmt.Printf("[store] Create subscription: email=%s, allRestaurants=%v, specificRestaurants=%v, subType=%s, " +
-		"amount=%s, paymentMethod=%s\n",
-		email, allRestaurants, specificRestaurants, subType, amount, paymentMethod)
+func (m *MemStore) CreateSubscription(sub Subscription) error {
+	fmt.Printf("[store] Create subscription: %v\n", sub)
 	return nil
 }
 

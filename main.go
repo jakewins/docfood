@@ -50,8 +50,14 @@ func Subscribe(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	err = db.CreateSubscription(payload.Email, payload.AllRestaurants, payload.SpecificRestaurants,
-		payload.Subscription.SubType, payload.Subscription.Amount, payload.PaymentMethod)
+	err = db.CreateSubscription(store.Subscription{
+		Email:               payload.Email,
+		AllRestaurants:      payload.AllRestaurants,
+		SpecificRestaurants: payload.SpecificRestaurants,
+		SubscriptionType:    payload.Subscription.SubType,
+		Amount:              payload.Subscription.Amount,
+		PaymentMethod:       payload.PaymentMethod,
+	})
 	if err != nil {
 		log.Printf("FATAL: Failed to create subscription: %s\n", err)
 		w.WriteHeader(http.StatusServiceUnavailable)
