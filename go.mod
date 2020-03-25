@@ -6,5 +6,6 @@ require (
 	cloud.google.com/go/firestore v1.1.1
 	github.com/google/uuid v1.1.1
 	github.com/julienschmidt/httprouter v1.3.0
+	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
 )
