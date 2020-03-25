@@ -1,0 +1,2 @@
+source devenv.local
+echo "${GITHUB_TOKEN}" | docker login docker.pkg.github.com -u "${GITHUB_USER}" --password-stdin

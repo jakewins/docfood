@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+main() {
+  docker build . -t docfood-web
+  docker tag docfood-web docker.pkg.github.com/jakewins/docfood/docfood-web:latest
+  docker push docker.pkg.github.com/jakewins/docfood/docfood-web:latest
+}
+
+main "$@"

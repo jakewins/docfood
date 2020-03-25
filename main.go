@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
 )
 
 var indexTemplate = mustLoadTemplate("index", "templates/index.html")
@@ -87,11 +88,14 @@ func main() {
 
 	baseCtx := context.Background()
 
-	var db store.Store
-	if os.Getenv("PRODUCTION") != "" {
-		db = store.NewFirestore()
-	} else {
-		db = store.NewMemStore()
+	datadir := os.Getenv("DATA_DIR")
+	if datadir == "" {
+		panic("Need DATA_DIR set pls")
+	}
+
+	db, err := store.NewFileStore(path.Join(datadir, "subscriptions"))
+	if err != nil {
+		panic(err)
 	}
 
 	baseCtx = store.NewContext(baseCtx, db)
@@ -100,7 +104,6 @@ func main() {
 	server.BaseContext = func(config net.Listener) context.Context { return baseCtx }
 
 	log.Println("Running at 0.0.0.0:" + port)
-
 	log.Fatal(server.ListenAndServe())
 }
 
