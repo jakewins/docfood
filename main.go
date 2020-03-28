@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"feed/pkg/store"
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/crypto/acme/autocert"
 	"html/template"
@@ -84,11 +82,10 @@ func main() {
 
 	router.NotFound = http.FileServer(http.Dir("./static"))
 
-	port, found := os.LookupEnv("PORT")
+	httpPort, found := os.LookupEnv("HTTP_PORT")
 	if !found {
-		port = "8080"
+		httpPort = "8080"
 	}
-
 
 	baseCtx := context.Background()
 
@@ -104,48 +101,47 @@ func main() {
 
 	baseCtx = store.NewContext(baseCtx, db)
 
-	if os.Getenv("PRODUCTION") == "true" {
-		tlsCacheDir := os.Getenv("TLS_CACHE_DIR")
-		if tlsCacheDir == "" {
-			panic("Need TLS_CACHE_DIR set pls")
-		}
-		startHttpsServer(tlsCacheDir, router, port)
+	if os.Getenv("HTTPS_PORT") != "" {
+		startHttpsServer(router, baseCtx, os.Getenv("HTTPS_PORT"), httpPort)
 	} else {
-		server := &http.Server{Addr: ":" + port, Handler: router}
-		server.BaseContext = func(config net.Listener) context.Context { return baseCtx }
-
-		log.Println("Running at 0.0.0.0:" + port)
-		log.Fatal(server.ListenAndServe())
+		startHttpServer(httpPort, router, baseCtx)
 	}
 }
 
-func startHttpsServer(cacheDir string, handler http.Handler, port string) {
+func startHttpServer(port string, handler http.Handler, baseCtx context.Context) {
+	server := &http.Server{Addr: ":" + port, Handler: handler}
+	server.BaseContext = func(config net.Listener) context.Context { return baseCtx }
+
+	log.Println("Running at 0.0.0.0:" + port)
+	log.Fatal(server.ListenAndServe())
+}
+
+func startHttpsServer(handler http.Handler, baseCtx context.Context, httpsPort, httpPort string) {
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		IdleTimeout:  120 * time.Second,
 		Handler:      handler,
 	}
+	srv.BaseContext = func(config net.Listener) context.Context { return baseCtx }
 
-	m := &autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: func(ctx context.Context, host string) error {
-			// Note: change to your real domain
-			allowedHost := "www.docfood.org"
-			if host == allowedHost {
-				return nil
-			}
-			return fmt.Errorf("acme/autocert: only %s host is allowed", allowedHost)
-		},
-		Cache:      autocert.DirCache(cacheDir),
-	}
-	srv.Addr = ":" + port
-	srv.TLSConfig = &tls.Config{GetCertificate: m.GetCertificate}
+	srv.Addr = ":" + httpsPort
 
 	go func() {
-		log.Println("Running at 0.0.0.0:" + port)
-		log.Fatal(srv.ListenAndServeTLS("", ""))
+		log.Println("Running at 0.0.0.0:" + httpsPort)
+		log.Fatal(srv.Serve(autocert.NewListener("www.docfood.org", "docfood.org")))
 	}()
+
+	startHttpServer(httpPort, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		target := "https://" + req.Host + req.URL.Path
+		if httpsPort != "443" {
+			target = "https://" + req.Host + ":" + httpsPort + req.URL.Path
+		}
+		if len(req.URL.RawQuery) > 0 {
+			target += "?" + req.URL.RawQuery
+		}
+		http.Redirect(w, req, target, http.StatusMovedPermanently)
+	}), baseCtx)
 }
 
 func mustLoadTemplate(name, path string) *template.Template {
